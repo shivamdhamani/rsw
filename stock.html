@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rajesh Trading Window</title>
+  <style>
+    /* Reset some default styles */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1e1e2f;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #f0f0f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+    }
+
+    .container {
+      background: #2c2c44;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      max-width: 800px;
+      width: 100%;
+      padding: 30px 40px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #64ffda;
+      text-shadow: 0 0 8px #64ffda;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      font-weight: 600;
+      color: #a0aec0;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 14px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: none;
+      background-color: #3a3a5a;
+      color: #e0e0ff;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      background-color: #4b4b7a;
+      box-shadow: 0 0 8px #64ffda;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      background-color: #64ffda;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      color: #1e1e2f;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 4px 10px rgba(100, 255, 218, 0.5);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      flex-grow: 1;
+      max-width: 200px;
+    }
+    button:hover {
+      background-color: #52cca9;
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(82, 204, 169, 0.8);
+    }
+    #clearBtn {
+      background-color: #ff4d6d;
+      color: white;
+      box-shadow: 0 4px 10px rgba(255, 77, 109, 0.6);
+    }
+    #clearBtn:hover {
+      background-color: #d63356;
+      box-shadow: 0 6px 14px rgba(214, 51, 86, 0.8);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 40px;
+      background-color: #38386b;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: center;
+      font-weight: 600;
+    }
+    th {
+      background: #64ffda;
+      color: #1e1e2f;
+      font-size: 15px;
+      letter-spacing: 0.05em;
+      user-select: none;
+    }
+    tbody tr:nth-child(odd) {
+      background-color: #47477e;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #3f3f73;
+    }
+
+    tbody td {
+      color: #e0e0ff;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    tbody td.profit {
+      color: #5aff7a;
+      font-weight: 700;
+    }
+    tbody td.loss {
+      color: #ff6b6b;
+      font-weight: 700;
+    }
+
+    #netResult {
+      margin-top: 28px;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      user-select: none;
+      letter-spacing: 0.05em;
+    }
+    #netResult.profit {
+      color: #5aff7a;
+      text-shadow: 0 0 10px #5aff7a;
+    }
+    #netResult.loss {
+      color: #ff6b6b;
+      text-shadow: 0 0 10px #ff6b6b;
+    }
+
+    @media (max-width: 600px) {
+      .buttons {
+        flex-direction: column;
+      }
+      button {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Rajesh Trading Window</h1>
+
+    <label for="stockName">Stock Name:</label>
+    <input list="stockNamesList" type="text" id="stockName" placeholder="Enter stock name" autocomplete="off" />
+    <datalist id="stockNamesList"></datalist>
+
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" placeholder="Enter quantity" min="1" />
+
+    <label for="buyRate">Buy Rate (₹):</label>
+    <input type="number" id="buyRate" placeholder="Enter buy rate per stock" min="0" step="0.01" />
+
+    <label for="sellRate">Sell Rate (₹):</label>
+    <input type="number" id="sellRate" placeholder="Enter sell rate per stock" min="0" step="0.01" />
+
+    <div class="buttons">
+      <button onclick="addTransaction()">Add Transaction</button>
+      <button id="clearBtn" onclick="clearAll()">Clear All Data</button>
+      <button onclick="exportToExcel()">Export to Excel</button>
+    </div>
+
+    <table id="transactionsTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>Stock Name</th>
+          <th>Quantity</th>
+          <th>Buy Amount (₹)</th>
+          <th>Sell Amount (₹)</th>
+          <th>Brokerage Buy (₹)</th>
+          <th>Brokerage Sell (₹)</th>
+          <th>Net Profit/Loss (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="transactionsBody"></tbody>
+    </table>
+
+    <div id="netResult"></div>
+  </div>
+
+  <!-- SheetJS library from CDN -->
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const brokeragePercent = 0.03 / 100; // 0.03%
+    let transactions = [];
+
+    function updateStockNamesList() {
+      const datalist = document.getElementById('stockNamesList');
+      const uniqueNames = [...new Set(transactions.map(t => t.stockName))];
+      datalist.innerHTML = '';
+      uniqueNames.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        datalist.appendChild(option);
+      });
+    }
+
+    window.onload = function() {
+      const saved = localStorage.getItem('stockTransactions');
+      if (saved) {
+        transactions = JSON.parse(saved);
+        updateTable();
+        updateStockNamesList();
+      }
+    };
+
+    function saveToLocalStorage() {
+      localStorage.setItem('stockTransactions', JSON.stringify(transactions));
+    }
+
+    function addTransaction() {
+      const stockName = document.getElementById('stockName').value.trim();
+      const quantity = parseFloat(document.getElementById('quantity').value);
+      const buyRate = parseFloat(document.getElementById('buyRate').value);
+      const sellRate = parseFloat(document.getElementById('sellRate').value);
+
+      if (!stockName || isNaN(quantity) || isNaN(buyRate) || isNaN(sellRate) || quantity <= 0 || buyRate < 0 || sellRate < 0) {
+        alert('Please enter valid inputs for all fields.');
+        return;
+      }
+
+      const totalBuy = quantity * buyRate;
+      const totalSell = quantity * sellRate;
+      const brokerageBuy = totalBuy * brokeragePercent;
+      const brokerageSell = totalSell * brokeragePercent;
+      const netBuy = totalBuy + brokerageBuy;
+      const netSell = totalSell - brokerageSell;
+      const profitLoss = netSell - netBuy;
+
+      const transaction = {
+        stockName,
+        quantity,
+        totalBuy,
+        totalSell,
+        brokerageBuy,
+        brokerageSell,
+        profitLoss
+      };
+
+      transactions.push(transaction);
+      saveToLocalStorage();
+      updateTable();
+      updateStockNamesList();
+      clearInputs();
+    }
+
+    function updateTable() {
+      const tbody = document.getElementById('transactionsBody');
+      tbody.innerHTML = '';
+
+      let netProfitLoss = 0;
+      transactions.forEach(tran => {
+        netProfitLoss += tran.profitLoss;
+
+        const profitClass = tran.profitLoss >= 0 ? 'profit' : 'loss';
+
+        const row = `<tr>
+          <td>${tran.stockName}</td>
+          <td>${tran.quantity}</td>
+          <td>₹${tran.totalBuy.toFixed(2)}</td>
+          <td>₹${tran.totalSell.toFixed(2)}</td>
+          <td>₹${tran.brokerageBuy.toFixed(2)}</td>
+          <td>₹${tran.brokerageSell.toFixed(2)}</td>
+          <td class="${profitClass}">₹${tran.profitLoss.toFixed(2)}</td>
+        </tr>`;
+        tbody.insertAdjacentHTML('beforeend', row);
+      });
+
+      document.getElementById('transactionsTable').style.display = transactions.length ? 'table' : 'none';
+
+      const netResultDiv = document.getElementById('netResult');
+      netResultDiv.className = netProfitLoss >= 0 ? 'profit' : 'loss';
+      netResultDiv.textContent = `Net Profit/Loss for all stocks: ₹${netProfitLoss.toFixed(2)}`;
+    }
+
+    function clearInputs() {
+      document.getElementById('stockName').value = '';
+      document.getElementById('quantity').value = '';
+      document.getElementById('buyRate').value = '';
+      document.getElementById('sellRate').value = '';
+    }
+
+    function clearAll() {
+      if (confirm("Are you sure you want to clear all your saved transactions?")) {
+        transactions = [];
+        saveToLocalStorage();
+        updateTable();
+        updateStockNamesList();
+      }
+    }
+
+    function exportToExcel() {
+      if (transactions.length === 0) {
+        alert("No transactions to export!");
+        return;
+      }
+
+      const wsData = [
+        [
+          "Stock Name",
+          "Quantity",
+          "Buy Amount (₹)",
+          "Sell Amount (₹)",
+          "Brokerage Buy (₹)",
+          "Brokerage Sell (₹)",
+          "Net Profit/Loss (₹)"
+        ]
+      ];
+
+      transactions.forEach(tran => {
+        wsData.push([
+          tran.stockName,
+          tran.quantity,
+          tran.totalBuy.toFixed(2),
+          tran.totalSell.toFixed(2),
+          tran.brokerageBuy.toFixed(2),
+          tran.brokerageSell.toFixed(2),
+          tran.profitLoss.toFixed(2)
+        ]);
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, "Transactions");
+      XLSX.writeFile(wb, "Rajesh_Trading_Transactions.xlsx");
+    }
+  </script>
+
+</body>
+</html>
